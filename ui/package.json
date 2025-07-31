@@ -28,6 +28,7 @@
     "wavtools": "^0.1.5"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
