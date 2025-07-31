@@ -8,10 +8,10 @@ import logging
 
 from main import (
     triage_agent,
-    faq_agent,
-    seat_booking_agent,
-    flight_status_agent,
-    cancellation_agent,
+    beauty_faq_agent,
+    product_consultation_agent,
+    order_status_agent,
+    returns_agent,
     create_initial_context,
 )
 
@@ -109,10 +109,10 @@ def _get_agent_by_name(name: str):
     """Return the agent object by name."""
     agents = {
         triage_agent.name: triage_agent,
-        faq_agent.name: faq_agent,
-        seat_booking_agent.name: seat_booking_agent,
-        flight_status_agent.name: flight_status_agent,
-        cancellation_agent.name: cancellation_agent,
+        beauty_faq_agent.name: beauty_faq_agent,
+        product_consultation_agent.name: product_consultation_agent,
+        order_status_agent.name: order_status_agent,
+        returns_agent.name: returns_agent,
     }
     return agents.get(name, triage_agent)
 
@@ -141,10 +141,10 @@ def _build_agents_list() -> List[Dict[str, Any]]:
         }
     return [
         make_agent_dict(triage_agent),
-        make_agent_dict(faq_agent),
-        make_agent_dict(seat_booking_agent),
-        make_agent_dict(flight_status_agent),
-        make_agent_dict(cancellation_agent),
+        make_agent_dict(beauty_faq_agent),
+        make_agent_dict(product_consultation_agent),
+        make_agent_dict(order_status_agent),
+        make_agent_dict(returns_agent),
     ]
 
 # =========================
@@ -205,7 +205,7 @@ async def chat_endpoint(req: ChatRequest):
                 passed=(g != failed),
                 timestamp=gr_timestamp,
             ))
-        refusal = "Sorry, I can only answer questions related to airline travel."
+        refusal = "Sorry, I can only answer questions related to L'Oréal beauty and cosmetics products."
         state["input_items"].append({"role": "assistant", "content": refusal})
         return ChatResponse(
             conversation_id=conversation_id,
@@ -283,11 +283,11 @@ async def chat_endpoint(req: ChatRequest):
                     metadata={"tool_args": tool_args},
                 )
             )
-            # If the tool is display_seat_map, send a special message so the UI can render the seat selector.
-            if tool_name == "display_seat_map":
+            # If the tool is display_product_catalog, send a special message so the UI can render the product catalog.
+            if tool_name == "display_product_catalog":
                 messages.append(
                     MessageResponse(
-                        content="DISPLAY_SEAT_MAP",
+                        content="DISPLAY_PRODUCT_CATALOG",
                         agent=item.agent.name,
                     )
                 )

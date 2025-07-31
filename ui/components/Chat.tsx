@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import type { Message } from "@/lib/types";
 import ReactMarkdown from "react-markdown";
-import { SeatMap } from "./seat-map";
+import { ProductCatalog } from "./product-catalog";
 
 interface ChatProps {
   messages: Message[];
@@ -16,24 +16,24 @@ export function Chat({ messages, onSendMessage, isLoading }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [inputText, setInputText] = useState("");
   const [isComposing, setIsComposing] = useState(false);
-  const [showSeatMap, setShowSeatMap] = useState(false);
-  const [selectedSeat, setSelectedSeat] = useState<string | undefined>(undefined);
+  const [showProductCatalog, setShowProductCatalog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<string | undefined>(undefined);
 
   // Auto-scroll to bottom when messages or loading indicator change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   }, [messages, isLoading]);
 
-  // Watch for special seat map trigger message (anywhere in list) and only if a seat has not been picked yet
+  // Watch for special product catalog trigger message (anywhere in list) and only if a product has not been picked yet
   useEffect(() => {
     const hasTrigger = messages.some(
-      (m) => m.role === "assistant" && m.content === "DISPLAY_SEAT_MAP"
+      (m) => m.role === "assistant" && m.content === "DISPLAY_PRODUCT_CATALOG"
     );
-    // Show map if trigger exists and seat not chosen yet
-    if (hasTrigger && !selectedSeat) {
-      setShowSeatMap(true);
+    // Show catalog if trigger exists and product not chosen yet
+    if (hasTrigger && !selectedProduct) {
+      setShowProductCatalog(true);
     }
-  }, [messages, selectedSeat]);
+  }, [messages, selectedProduct]);
 
   const handleSend = useCallback(() => {
     if (!inputText.trim()) return;
@@ -41,11 +41,11 @@ export function Chat({ messages, onSendMessage, isLoading }: ChatProps) {
     setInputText("");
   }, [inputText, onSendMessage]);
 
-  const handleSeatSelect = useCallback(
-    (seat: string) => {
-      setSelectedSeat(seat);
-      setShowSeatMap(false);
-      onSendMessage(`I would like seat ${seat}`);
+  const handleProductSelect = useCallback(
+    (product: string) => {
+      setSelectedProduct(product);
+      setShowProductCatalog(false);
+      onSendMessage(`I'm interested in ${product}`);
     },
     [onSendMessage]
   );
@@ -62,15 +62,15 @@ export function Chat({ messages, onSendMessage, isLoading }: ChatProps) {
 
   return (
     <div className="flex flex-col h-full flex-1 bg-white shadow-sm border border-gray-200 border-t-0 rounded-xl">
-      <div className="bg-blue-600 text-white h-12 px-4 flex items-center rounded-t-xl">
+      <div className="bg-gradient-to-r from-pink-600 to-purple-600 text-white h-12 px-4 flex items-center rounded-t-xl">
         <h2 className="font-semibold text-sm sm:text-base lg:text-lg">
-          Customer View
+          L'Oréal Customer Service
         </h2>
       </div>
       {/* Messages */}
       <div className="flex-1 overflow-y-auto min-h-0 md:px-4 pt-4 pb-20">
         {messages.map((msg, idx) => {
-          if (msg.content === "DISPLAY_SEAT_MAP") return null; // Skip rendering marker message
+          if (msg.content === "DISPLAY_PRODUCT_CATALOG") return null; // Skip rendering marker message
           return (
             <div
               key={idx}
@@ -89,19 +89,19 @@ export function Chat({ messages, onSendMessage, isLoading }: ChatProps) {
             </div>
           );
         })}
-        {showSeatMap && (
+        {showProductCatalog && (
           <div className="flex justify-start mb-5">
             <div className="mr-4 rounded-[16px] rounded-bl-[4px] md:mr-24">
-              <SeatMap
-                onSeatSelect={handleSeatSelect}
-                selectedSeat={selectedSeat}
+              <ProductCatalog
+                onProductSelect={handleProductSelect}
+                selectedProduct={selectedProduct}
               />
             </div>
           </div>
         )}
         {isLoading && (
           <div className="flex mb-5 text-sm justify-start">
-            <div className="h-3 w-3 bg-black rounded-full animate-pulse" />
+            <div className="h-3 w-3 bg-pink-500 rounded-full animate-pulse" />
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -119,7 +119,7 @@ export function Chat({ messages, onSendMessage, isLoading }: ChatProps) {
                     tabIndex={0}
                     dir="auto"
                     rows={2}
-                    placeholder="Message..."
+                    placeholder="Ask about L'Oréal beauty products..."
                     className="mb-2 resize-none border-0 focus:outline-none text-sm bg-transparent px-0 pb-6 pt-2"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
@@ -130,7 +130,7 @@ export function Chat({ messages, onSendMessage, isLoading }: ChatProps) {
                 </div>
                 <button
                   disabled={!inputText.trim()}
-                  className="flex h-8 w-8 items-end justify-center rounded-full bg-black text-white hover:opacity-70 disabled:bg-gray-300 disabled:text-gray-400 transition-colors focus:outline-none"
+                  className="flex h-8 w-8 items-end justify-center rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:opacity-70 disabled:bg-gray-300 disabled:text-gray-400 transition-colors focus:outline-none"
                   onClick={handleSend}
                 >
                   <svg
